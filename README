@@ -46,7 +46,7 @@ information for all the sensors / types of data (discharge, depth, etc)
 in the configuration file.
 
 * Calls to the Ducksboard API are handled by a small pool of HTTP
-connections.  The pool size is a constant MAX_PUSH_CONNECTIONS defined
+connections.  The pool size is a constant, MAX_PUSH_CONNECTIONS, defined
 in main.go, currently set to 4. And since Ducksboard supports HTTP keep-
 alives only 4 TCP connections will be used.
 
