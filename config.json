@@ -1,0 +1,122 @@
+{
+    "push_url": "https://push.ducksboard.com/values/",
+    "api_key": "YOUR API-KEY HERE",
+    "refresh": 900,
+    "usgs_url": "http://waterservices.usgs.gov/nwis/iv?modifiedSince=PT4H",
+    "sources": {
+        "image": [
+            {
+                "source": "http://www.hpc.ncep.noaa.gov/qpf/d13_fill.gif",
+                "caption": "3 Day Precipitation Forecast. Source: NOAA/NWS.",
+                "widget": "12723"
+            },
+            {
+                "source": "http://www.hpc.ncep.noaa.gov/qpf/p120i12.gif",
+                "caption": "5 Day Precipitation Forecast. Source: NOAA/NWS.",
+                "widget": "11505"
+            }
+        ],
+        "usgs": [
+            {
+                "name": "Big South Fork",
+                "site": "03410210",
+                "param": "00060",
+                "widget": "11274",
+                "bars": {
+                    "low": {
+                        "widget": "12254",
+                        "value": 1000
+                    },
+                    "current": {
+                        "widget": "12256"
+                    },
+                    "high": {
+                        "widget": "12255",
+                        "value": 3000
+                    }
+                }
+            },
+            {
+                "name": "Elkhorn",
+                "site": "03289500",
+                "param": "00060",
+                "widget": "12679",
+                "bars": {
+                    "low": {
+                        "widget": "12695",
+                        "value": 250
+                    },
+                    "current": {
+                        "widget": "12697"
+                    },
+                    "high": {
+                        "widget": "12696",
+                        "value": 4000
+                    }
+                }
+            },
+            {
+                "name": "Rockcastle",
+                "site": "03406500",
+                "param": "00060",
+                "widget": "12685",
+                "bars": {
+                    "low": {
+                        "widget": "12698",
+                        "value": 200
+                    },
+                    "current": {
+                        "widget": "12700"
+                    },
+                    "high": {
+                        "widget": "12699",
+                        "value": 3000
+                    }
+                }
+            },
+            {
+                "name": "Pigeon",
+                "site": "03460795",
+                "param": "00060",
+                "widget": "12681",
+                "bars": {
+                    "low": {
+                        "widget": "12690",
+                        "value": 300
+                    },
+                    "current": {
+                        "widget": "12692"
+                    },
+                    "high": {
+                        "widget": "12691",
+                        "value": 3000
+                    }
+                }
+            },
+            {
+                "name": "Red Hazel Green",
+                "site": "03282500",
+                "param": "00060",
+                "widget": "12736"
+            },
+            {
+                "name": "Elkhorn, North",
+                "site": "03288100",
+                "param": "00060",
+                "widget": "12738"
+            },
+            {
+                "name": "Elkhorn, South",
+                "site": "03289300",
+                "param": "00060",
+                "widget": "12737"
+            },
+            {
+                "name": "KY-Pool 8",
+                "site": "03284500",
+                "param": "00060",
+                "widget": "12739"
+            }
+        ]
+    }
+}
