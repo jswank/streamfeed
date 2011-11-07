@@ -1,16 +1,16 @@
 Background
 ----------
 
-This is an entry in the Ducksboard Hackathon:
-  http://blog.ducksboard.com/2011/10/lets-make-a-distributed-hackathon/
+This is an entry in the Ducksboard Hackathon.  See the live dashboard at:
+    https://public.ducksboard.com/4p2wevyDlQBlTFeui_Q5/
 
 Streamfeed sends information about streams- the physical, wet kind- to
 the Ducksboard API.  Its primary data source is the USGS Water Services
 API (http://waterservices.usgs.gov/), which provides a flexible API to
 various data from thousands of deployed sensors.
 
-But, hydrologists (probably?) are already able to analyze this data in
-a more sophisticated way than using Ducksboard, right?  Right.  But this
+But, hydrologists (probably?) are already able to analyze this data in a
+more sophisticated way than using Ducksboard, right?  Right.  But this
 information- realtime and recent- is also of interest to other people.
 
 Whitewater kayakers need to know what streams and rivers are runnable 
