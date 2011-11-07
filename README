@@ -1,0 +1,59 @@
+Background
+----------
+
+This is an entry in the Ducksboard Hackathon:
+  http://blog.ducksboard.com/2011/10/lets-make-a-distributed-hackathon/
+
+Streamfeed sends information about streams- the physical, wet kind- to
+the Ducksboard API.  Its primary data source is the USGS Water Services
+API (http://waterservices.usgs.gov/), which provides a flexible API to
+various data from thousands of deployed sensors.
+
+But, hydrologists (probably?) are already able to analyze this data in
+a more sophisticated way than using Ducksboard, right?  Right.  But this
+information- realtime and recent- is also of interest to other people.
+
+Whitewater kayakers need to know what streams and rivers are runnable 
+(able to be be navigated at an acceptable/desired level of risk) in
+enough time to get to a launch site with a boat.  Preferably with some
+other people, and a couple of vehicles.  Knowing what the river is doing
+now- combined with a weather forecast and some social networking- makes
+this an easier task.
+
+Technical Details
+-----------------
+
+Here's a application written in Go (http://golang.org) that updates
+Ducksboard widgets with images and USGS gauge information.  It can be
+configured via a JSON configuration file to query / update other USGS 
+sensors as required.
+
+To compile:
+    cd ducksboard
+    gomake
+    cd ..
+    gomake
+
+To run:
+    edit config.json, inserting your Ducksboard API key
+    ./streamfeeder -f config.json
+
+
+A couple of notes:
+
+* A single HTTP call is made to the USGS API, and the response includes
+information for all the sensors / types of data (discharge, depth, etc)
+in the configuration file.
+
+* Calls to the Ducksboard API are handled by a small pool of HTTP
+connections.  The pool size is a constant MAX_PUSH_CONNECTIONS defined
+in main.go, currently set to 4. And since Ducksboard supports HTTP keep-
+alives only 4 TCP connections will be used.
+
+* I used the Go release weekly.2011-11-02 for development.  A change
+with error handling just occurred ("os.Error" is now "error"), so if you
+want to compile this with an older version of Go, you'll have to address
+that.
+
+* This is all rough- I used the hackathon to write something with Go, and
+it's not necessarily pretty.
