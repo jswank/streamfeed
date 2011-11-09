@@ -66,9 +66,9 @@ type PushRequest struct {
     Value string
 }
 
-func NewPushRequest(widgetid, apikey string) (*PushRequest) {
+func NewPushRequest(apikey string) (*PushRequest) {
    req := new(PushRequest)
-   req.WidgetID = widgetid
+//   req.WidgetID = widgetid
    req.APIkey = apikey
    return req
 }

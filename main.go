@@ -16,7 +16,7 @@ const MAX_PUSH_CONNECTIONS = 4
 type Config struct {
     Push_url string `json:"push_url"`
     API_key string `json:"api_key"`
-    Refresh int `json:"refresh"`
+    Refresh int64 `json:"refresh"`
     USGS_url string `json:"usgs_url"`
     Sources ConfigSources `json:"sources"`
 }
@@ -64,6 +64,105 @@ func ParseConfig(filename string) (config Config, err error) {
     return
 }
 
+func LoopUpdate(config Config, quit chan bool) {
+    Update(config)
+    if ( config.Refresh < 60 ) {
+        log.Println("Refresh interval is less than 60 seconds. Exiting to avoid abuse...")
+        quit<-true
+    }
+    for {
+        log.Printf("Sleeping for %d seconds\n", config.Refresh)
+        time.Sleep(config.Refresh*1e9)
+        Update(config)
+    }
+}
+
+func Update(config Config) {
+
+    http_client := new(http.Client)
+
+    // this is the channel that receives http requests to ducksboard
+    var clientRequests = make(chan *http.Request)
+
+    // Push routines talk back on this channel
+    var push_complete = make(chan int)
+    for i:= 0; i < MAX_PUSH_CONNECTIONS; i++ {
+        go Push(http_client,push_complete,clientRequests)
+    }
+
+    // current time
+    now := time.UTC().Seconds()
+
+    push_rq := ducksboard.NewPushRequest(config.API_key)
+
+    // Image Updates
+    log.Printf("Pushing image widgets\n")
+    for _,image := range(config.Sources.Image) {
+        v := ducksboard.Image{Timestamp: now}
+        v.Value.Source = image.Source
+        v.Value.Caption = image.Caption
+
+        push_rq.WidgetID = image.Widget
+//        push_rq := ducksboard.NewPushRequest(image.Widget,config.API_key)
+
+        value,err := json.Marshal(v)
+        if err != nil {
+            log.Printf("error marshalling db_val: %s", err)
+            break;
+        }
+
+        push_rq.Value = string(value)
+        http_req,_ := push_rq.Request()
+        clientRequests <- http_req
+    }
+
+
+    // USGS Updates
+    usgs := NewUSGS_Source(config)
+    log.Printf("Fetching USGS data\n")
+    err := usgs.FetchData(http_client)
+    if err != nil {
+        log.Printf("error fetching data: %s", err)
+        return
+    }
+    //fmt.Printf("USGS Response: %s\n", usgs.response)
+
+    log.Printf("Pushing USGS widgets\n")
+    for _,widget_id := range(usgs.Widgets()) {
+        val,ts,err := usgs.WidgetValue(widget_id)
+        if err != nil {
+            log.Printf("error getting value for widget, %s\n", err)
+        } else {
+ //           push_rq := ducksboard.NewPushRequest(widget_id,config.API_key)
+            push_rq.WidgetID = widget_id
+            db := ducksboard.Counter{Value: int(val) }
+
+            t,err := time.Parse(time.RFC3339,ts)
+            if err == nil {
+                db.Timestamp = t.Seconds()
+            }
+
+            json,err := json.Marshal(db)
+            if err != nil {
+                log.Printf("error marshalling db_val: %s", err)
+                break;
+            }
+
+            push_rq.Value = string(json)
+            http_req,_ := push_rq.Request()
+            clientRequests <- http_req
+        }
+    }
+
+    // all requests have been placed in the channel
+    close(clientRequests)
+    // block until all Push routines to complete
+    for i:= 0; i < MAX_PUSH_CONNECTIONS; i++ {
+        <-push_complete
+    }
+
+}
+
 func Push(client *http.Client, quit chan int, queue chan *http.Request) {
     for r:= range queue {
         resp,err := client.Do(r)
@@ -85,82 +184,14 @@ func main() {
 
     config,err := ParseConfig(*config_file)
     if err != nil {
-        fmt.Printf("Invalid config: %s\n", err)
-        return
+        log.Fatal( fmt.Sprintf("Invalid config: %s\n", err) )
     }
 
-    http_client := new(http.Client)
+    // this is the channel that main blocks on
+    var quit = make(chan bool)
 
-    // this is the channel that receives http requests to ducksboard
-    var clientRequests = make(chan *http.Request)
+    go LoopUpdate(config,quit)
 
-    // Push routines talk back on this channel
-    var push_complete = make(chan int)
-    for i:= 0; i < MAX_PUSH_CONNECTIONS; i++ {
-        go Push(http_client,push_complete,clientRequests)
-    }
+    <-quit
 
-    // current time
-    now := time.UTC().Seconds()
-
-    // Image Updates
-    for _,image := range(config.Sources.Image) {
-        push_rq := ducksboard.NewPushRequest(image.Widget,config.API_key)
-        db := ducksboard.Image{Timestamp: now}
-        db.Value.Source = image.Source
-        db.Value.Caption = image.Caption
-        json,err := json.Marshal(db)
-        if err != nil {
-            fmt.Printf("error marshalling db_val: %s", err)
-            break;
-        }
-
-        push_rq.Value = string(json)
-        http_req,_ := push_rq.Request()
-        clientRequests <- http_req
-    }
-
-
-    // USGS Updates
-    usgs := NewUSGS_Source(config)
-
-    err = usgs.FetchData(http_client)
-    if err != nil {
-        fmt.Printf("error fetching data: %s", err)
-        return
-    }
-    //fmt.Printf("USGS Response: %s\n", usgs.response)
-
-    for _,widget_id := range(usgs.Widgets()) {
-        val,ts,err := usgs.WidgetValue(widget_id)
-        if err != nil {
-            fmt.Printf("error getting value for widget, %s\n", err)
-        } else {
-            push_rq := ducksboard.NewPushRequest(widget_id,config.API_key)
-            db := ducksboard.Counter{Value: int(val) }
-
-            t,err := time.Parse(time.RFC3339,ts)
-            if err == nil {
-                db.Timestamp = t.Seconds()
-            }
-
-            json,err := json.Marshal(db)
-            if err != nil {
-                fmt.Printf("error marshalling db_val: %s", err)
-                break;
-            }
-
-            push_rq.Value = string(json)
-            http_req,_ := push_rq.Request()
-            clientRequests <- http_req
-        }
-    }
-
-
-    // all requests have been placed in the channel
-    close(clientRequests)
-    // block until all Push routines to complete
-    for i:= 0; i < MAX_PUSH_CONNECTIONS; i++ {
-        <-push_complete
-    }
 }
