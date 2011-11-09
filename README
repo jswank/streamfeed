@@ -4,6 +4,9 @@ Background
 This is an entry in the Ducksboard Hackathon.  See the live dashboard at:
     https://public.ducksboard.com/4p2wevyDlQBlTFeui_Q5/
 
+UPDATE: and it won! Thanks guys!
+    http://blog.ducksboard.com/2011/11/announcing-the-hackathon-results/
+
 Streamfeed sends information about streams- the physical, wet kind- to
 the Ducksboard API.  Its primary data source is the USGS Water Services
 API (http://waterservices.usgs.gov/), which provides a flexible API to
