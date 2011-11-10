@@ -44,9 +44,14 @@ To run:
 
 A couple of notes:
 
+* The app runs in the foreground, sleeping for the number of seconds
+defined by the "refresh" configuration setting then re-querying sources. 
+If this parameter is less than 60 then the app will exit after a single 
+run- allowing it to be run from cron or similar if desired.
+
 * A single HTTP call is made to the USGS API, and the response includes
 information for all the sensors / types of data (discharge, depth, etc)
-in the configuration file.
+defined in the configuration file.
 
 * Calls to the Ducksboard API are handled by a small pool of HTTP
 connections.  The pool size is a constant, MAX_PUSH_CONNECTIONS, defined
@@ -58,7 +63,3 @@ with error handling just occurred ("os.Error" is now "error"), so if you
 want to compile this with an older version of Go, you'll have to address
 that.
 
-* The app runs in the foreground, sleeping for the number of seconds
-defined by the "refresh" configuration setting then re-querying sources. 
-If this parameter is less than 60 then the app will exit after a single 
-run- allowing it to be run from cron or similar if desired.
