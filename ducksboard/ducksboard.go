@@ -1,8 +1,9 @@
 package ducksboard
 
 import (
-	"strings"
+	"bytes"
 	"http"
+    "json"
 )
 
 const PUSH_URL = "https://push.ducksboard.com/values/"
@@ -63,19 +64,25 @@ type TimelineValue struct {
 type PushRequest struct {
     WidgetID string
     APIkey string
-    Value string
+    Value interface{}
 }
 
 func NewPushRequest(apikey string) (*PushRequest) {
    req := new(PushRequest)
-//   req.WidgetID = widgetid
    req.APIkey = apikey
    return req
 }
 
 func (pr *PushRequest) Request() (req *http.Request, err error) {
-    reader := strings.NewReader(pr.Value)
-    req, err = http.NewRequest("POST", PUSH_URL + pr.WidgetID, reader)
+    var b []byte
+
+    b,err = json.Marshal(pr.Value)
+    if err != nil {
+        return
+    }
+    buf := bytes.NewBuffer(b)
+
+    req, err = http.NewRequest("POST", PUSH_URL + pr.WidgetID, buf)
     if err != nil {
         return
     }

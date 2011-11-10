@@ -98,21 +98,18 @@ func Update(config Config) {
     // Image Updates
     log.Printf("Pushing image widgets\n")
     for _,image := range(config.Sources.Image) {
-        v := ducksboard.Image{Timestamp: now}
-        v.Value.Source = image.Source
-        v.Value.Caption = image.Caption
+        rq_val := ducksboard.Image{Timestamp: now}
+        rq_val.Value.Source = image.Source
+        rq_val.Value.Caption = image.Caption
 
+        push_rq.Value = rq_val
         push_rq.WidgetID = image.Widget
-//        push_rq := ducksboard.NewPushRequest(image.Widget,config.API_key)
 
-        value,err := json.Marshal(v)
+        http_req,err := push_rq.Request()
         if err != nil {
-            log.Printf("error marshalling db_val: %s", err)
-            break;
+            log.Printf("error generating push request, %s", err)
+            continue
         }
-
-        push_rq.Value = string(value)
-        http_req,_ := push_rq.Request()
         clientRequests <- http_req
     }
 
@@ -134,22 +131,21 @@ func Update(config Config) {
             log.Printf("error getting value for widget, %s\n", err)
         } else {
  //           push_rq := ducksboard.NewPushRequest(widget_id,config.API_key)
-            push_rq.WidgetID = widget_id
-            db := ducksboard.Counter{Value: int(val) }
+            rq_val := ducksboard.Counter{Value: int(val)}
 
             t,err := time.Parse(time.RFC3339,ts)
             if err == nil {
-                db.Timestamp = t.Seconds()
+                rq_val.Timestamp = t.Seconds()
             }
 
-            json,err := json.Marshal(db)
+            push_rq.Value = rq_val
+            push_rq.WidgetID = widget_id
+
+            http_req,err := push_rq.Request()
             if err != nil {
-                log.Printf("error marshalling db_val: %s", err)
-                break;
+                log.Printf("error generating push request, %s", err)
+                continue
             }
-
-            push_rq.Value = string(json)
-            http_req,_ := push_rq.Request()
             clientRequests <- http_req
         }
     }
