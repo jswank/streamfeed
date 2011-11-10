@@ -1,7 +1,7 @@
 {
     "push_url": "https://push.ducksboard.com/values/",
-    "api_key": "YOUR API-KEY HERE",
-    "refresh": 900,
+    "api_key": "YOUR DUCKSOARD API KEY",
+    "refresh": 1800,
     "usgs_url": "http://waterservices.usgs.gov/nwis/iv?modifiedSince=PT4H",
     "sources": {
         "image": [

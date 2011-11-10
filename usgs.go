@@ -16,7 +16,7 @@ type TimeSeriesResponse struct {
 
 type TimeSeries struct {
 	Name string `xml:"attr"`
-    // dunno why this didn't work
+	// dunno why this didn't work
 	//    SourceInfo SourceInfo `xml:"sourceInfo"`
 	SiteName    string            `xml:"sourceInfo>siteName"`
 	SiteCode    string            `xml:"sourceInfo>siteCode"`
@@ -46,7 +46,7 @@ type USGS_Source struct {
 	config   []ConfigUSGS_Site
 }
 
-func NewUSGS_Source(config Config) (usgs USGS_Source) {
+func NewUSGS_Source(config *Config) (usgs USGS_Source) {
 	usgs.url = config.USGS_url
 	usgs.config = config.Sources.USGS
 	return
