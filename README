@@ -50,7 +50,7 @@ in the configuration file.
 
 * Calls to the Ducksboard API are handled by a small pool of HTTP
 connections.  The pool size is a constant, MAX_PUSH_CONNECTIONS, defined
-in main.go, currently set to 4. And since Ducksboard supports HTTP keep-
+in config.go, currently set to 4. And since Ducksboard supports HTTP keep-
 alives only 4 TCP connections will be used.
 
 * I used the Go release weekly.2011-11-02 for development.  A change
@@ -58,5 +58,7 @@ with error handling just occurred ("os.Error" is now "error"), so if you
 want to compile this with an older version of Go, you'll have to address
 that.
 
-* This is all rough- I used the hackathon to write something with Go, and
-it's not necessarily pretty.
+* The app runs in the foreground, sleeping for the number of seconds
+defined by the "refresh" configuration setting then re-querying sources. 
+If this parameter is less than 60 then the app will exit after a single 
+run- allowing it to be run from cron or similar if desired.
