@@ -1,12 +1,12 @@
 package main
 
 import (
-	"fmt"
-	"http"
-	"time"
-	"flag"
-	"log"
 	"./ducksboard/_obj/ducksboard"
+	"flag"
+	"fmt"
+	"log"
+	"net/http"
+	"time"
 )
 
 // Run Update() at a regular interval
@@ -113,11 +113,14 @@ func Update(config *Config) {
 func Push(client *http.Client, quit chan int, queue chan *http.Request) {
 	for r := range queue {
 		resp, err := client.Do(r)
-		if err != nil {
-			log.Printf("error performing push: %s", err)
-		}
 		// Body is always non-nil: this works regardless of error
 		resp.Body.Close()
+
+		if err != nil {
+			log.Printf("error performing push: %s", err)
+		} else if resp.StatusCode != 200 {
+			log.Printf("got non-OK response from Ducksboard API: %s", resp.Status)
+		}
 	}
 	quit <- 1
 	return

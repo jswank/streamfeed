@@ -1,7 +1,7 @@
 package main
 
 import (
-	"json"
+	"encoding/json"
 	"io/ioutil"
 )
 

@@ -2,8 +2,8 @@ package ducksboard
 
 import (
 	"bytes"
-	"http"
-	"json"
+	"encoding/json"
+	"net/http"
 )
 
 const PUSH_URL = "https://push.ducksboard.com/values/"

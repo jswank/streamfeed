@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fmt"
+	"encoding/xml"
 	"errors"
-	"xml"
-	"http"
+	"fmt"
+	"net/http"
 	//    "json"
 	//    "os"
 	"strings"
